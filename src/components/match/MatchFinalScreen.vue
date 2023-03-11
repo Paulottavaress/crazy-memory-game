@@ -12,40 +12,42 @@
   </div>
 </template>
 
-<script>
-  export default {
+<script lang="ts">
+  import { defineComponent } from 'vue';
+  import type { PropType } from 'vue';
+  import Player from '@/types/Player';
+
+  export default defineComponent({
     computed: {
-      isATie() {
-        console.log('isATie', this.matchFinalResult)
-        return this.matchFinalResult.length > 0;
+      isATie(): boolean {
+        return this.matchFinalResult.length > 1;
       },
-      matchFinalResult() {
-        let highestScorerPlayer = [{score: 0}];
+      matchFinalResult(): Player[] {
+        let highestScorerPlayer: Player[] = [];
 
         this.players.forEach(player => {
-          if (player.score > highestScorerPlayer[0].score) highestScorerPlayer = [player];
+          if (highestScorerPlayer.length === 0 || player.score > highestScorerPlayer[0].score) highestScorerPlayer = [player];
           else if (player.score === highestScorerPlayer[0].score) highestScorerPlayer.push(player);
         });
 
         return highestScorerPlayer;
       },
-      winnersNames() {
-        let winners = [];
-        this.matchFinalResult.forEach(winner => winners.push(winner.name));
-        winners = winners.join(', ');
-        const lastIndex = winners.lastIndexOf(',');
-        winners = winners.slice(0, lastIndex) + ' and' + winners.slice(lastIndex + 1);
-        return winners;
+      winnersNames(): string {
+        const winnersArr: string[] = [];
+        this.matchFinalResult.forEach(winner => winnersArr.push(winner.name));
+        let winnersStr = winnersArr.join(', ');
+        const lastIndex = winnersStr.lastIndexOf(',');
+        winnersStr = winnersStr.slice(0, lastIndex) + ' and' + winnersStr.slice(lastIndex + 1);
+        return winnersStr;
       }
     },
     props: {
       players: {
-        type: Array,
-        required: true,
-        default: [{score: 0}]
+        type: Array as PropType<Player[]>,
+        required: true
       }
     }
-  }
+  });
 </script>
 
 <style></style>

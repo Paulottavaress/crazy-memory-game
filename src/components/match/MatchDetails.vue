@@ -7,15 +7,19 @@
   </div>
 </template>
 
-<script>
-  export default {
+<script lang="ts">
+  import { defineComponent } from 'vue';
+  import Player from '@/types/Player';
+  import type { PropType } from 'vue';
+
+  export default defineComponent({
     props: {
       currentPlayer: {
-        type: Object,
+        type: Object as PropType<Player>,
         required: true
       }
     }
-  };
+  });
 </script>
 
 <style scoped>

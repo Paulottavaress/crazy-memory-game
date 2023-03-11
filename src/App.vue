@@ -5,13 +5,14 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent } from 'vue';
   import GameBoard from './components/match/GameBoard.vue';
 
-  export default {
+  export default defineComponent ({
     components: {
       GameBoard
     }
-  }
+  });
 </script>
 
 <style lang="scss">
