@@ -32,11 +32,10 @@
 
   body {
     margin: 0px;
-  }
 
-  #main-container {
-    height: 100vh;
-    width: 100vw;
-    padding: 4px;
+    #main-container {
+      height: 100vh;
+      width: 100vw;
+    }
   }
 </style>

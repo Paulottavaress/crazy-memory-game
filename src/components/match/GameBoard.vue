@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main ref="main">
     <section
       v-if="isGameRunning"
       id="game-board"
@@ -9,7 +9,10 @@
         :key="tile.id"
         @click="selectTile(tile)"
       >
-        <BaseTile v-if="!tile.isPaired">
+        <BaseTile
+          :class="tile.isPaired ? 'tile-hidden' : 'tile-visible'"
+          :tileSize="calculateTileSize"
+        >
           <p v-if="tile.isSelected">{{ tile.value }}</p>
         </BaseTile>
       </div>
@@ -50,8 +53,32 @@
       MatchFinalScreen
     },
     computed: {
+      calculateTileSize(): {width: number, height: number} {
+        const gb = this.$refs.main as HTMLElement;
+        const gbPaddingRight = parseInt(window.getComputedStyle(gb).paddingRight);
+        const gbPaddingLeft = parseInt(window.getComputedStyle(gb).paddingLeft);
+        const gbWidth = gb.clientWidth - gbPaddingLeft - gbPaddingRight;
+        const gbPaddingTop = parseInt(window.getComputedStyle(gb).paddingTop);
+        const gbPaddingBottom = parseInt(window.getComputedStyle(gb).paddingBottom);
+        const gbHeight = gb.clientHeight - gbPaddingTop - gbPaddingBottom;
+        const gbPixels = gbWidth * gbHeight;
+        const tilesTotalCount = this.gameConfig.pairCount * 2;
+        const gbPixelsPerTile = gbPixels / tilesTotalCount;
+        let tileArea = 100;
+        let tileHeight = 10;
+
+        while (tileArea < gbPixelsPerTile) {
+          tileArea = tileHeight ** 2;
+          if (tileArea < gbPixelsPerTile) tileHeight++;
+        }
+
+        return {
+          width: tileHeight - this.deviceSettings.tileSizeCorrection, 
+          height: tileHeight - this.deviceSettings.tileSizeCorrection
+        };
+      },
       checkIfIsMatch(): boolean {
-        return this.selectedTiles[0].value === this.selectedTiles[1].value;
+        return this.selectedTiles[0] && this.selectedTiles[1] && this.selectedTiles[0].value === this.selectedTiles[1].value;
       },
       currentPlayer(): Player {
         return this.players.filter(player => player.isTurn)[0];
@@ -65,8 +92,12 @@
     },
     data() {
       return {
+        deviceSettings: {
+          tileSizeCorrection: 2,
+          tileGap: 1
+        },
         gameConfig: {
-          pairCount: 3, //24 //36 //48(probably won't work in small devices)
+          pairCount: 24, //24 //36 //48(probably won't work in small devices)
           matchBasePoints: 50,
           playerTurnTimeLimitMs: 30000,
           tileFaceUpMs: 1000
@@ -107,6 +138,17 @@
           isPaired: false
         });
       },
+      checkIfTilesAreOverflowing() {
+        const gb = this.$refs.main as HTMLElement;
+
+        if (gb) {
+          const isOverflowing = 
+          gb.clientWidth < gb.scrollWidth 
+          || gb.clientHeight < gb.scrollHeight;
+
+          if (isOverflowing) this.deviceSettings.tileSizeCorrection++;
+        }
+      },
       handleMatch(): void {
         this.selectedTiles.forEach((selectedTile: Tile) => {
           const tile = this.tiles.find(tile => (tile.id === selectedTile.id));
@@ -141,7 +183,10 @@
       },
       selectTile(selectedTile: Tile): void {
         // add animation: https://www.w3schools.com/howto/howto_css_flip_card.asp
-        if (this.selectedTiles.find(tile => selectedTile.id === tile.id)) return;
+        if (
+          this.selectedTiles.find(tile => selectedTile.id === tile.id)
+          || selectedTile.isPaired
+        ) return;
         if (!this.currentPlayer.hasTurnedSecondTile) {
           selectedTile.isSelected = true;
           if (this.currentPlayer.hasTurnedFirstTile) {
@@ -177,7 +222,10 @@
         this.tiles.forEach(tile => tile.isSelected = false);
       }
     },
-    name: 'GameBoard'
+    name: 'GameBoard',
+    updated() {
+      this.checkIfTilesAreOverflowing();
+    }
   });
 </script>
 
@@ -193,9 +241,26 @@
       height: 100%;
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
       justify-content: center;
       align-items: center;
+    }
+  }
+
+  @media (min-width: 425px) {
+    #game-board {
+      gap: 2px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    #game-board {
+      gap: 4px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    #game-board {
+      gap: 8px;
     }
   }
 </style>
