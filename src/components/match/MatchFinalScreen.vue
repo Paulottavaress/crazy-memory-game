@@ -50,4 +50,8 @@
   });
 </script>
 
-<style></style>
+<style>
+  #match-final-screen {
+    padding: var(--app-external-padding);
+  }
+</style>

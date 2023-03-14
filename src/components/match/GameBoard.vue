@@ -2,19 +2,23 @@
   <main ref="main">
     <section
       v-if="isGameRunning"
-      id="game-board"
+      id="gameboard"
     >
-      <div
-        v-for="tile in tiles"
-        :key="tile.id"
-        @click="selectTile(tile)"
-      >
-        <BaseTile
-          :class="tile.isPaired ? 'tile-hidden' : 'tile-visible'"
-          :tileSize="calculateTileSize"
-        >
-          <p v-if="tile.isSelected">{{ tile.value }}</p>
-        </BaseTile>
+      <div id="tiles-area">
+        <div id="tiles-wrapper">
+          <div
+            v-for="tile in tiles"
+            :key="tile.id"
+            @click="selectTile(tile)"
+          >
+            <BaseTile
+              :class="tile.isPaired ? 'tile-hidden' : 'tile-visible'"
+              :tileSize="calculateTileSize"
+            >
+              <p v-if="tile.isSelected">{{ tile.value }}</p>
+            </BaseTile>
+          </div>
+        </div>
       </div>
       <MatchDetails :currentPlayer="currentPlayer" />
     </section>
@@ -234,33 +238,50 @@
     background-color: var(--game-table-color);
     height: 100%;
     width: 100%;
-    padding: 8px;
 
-    #game-board {
+    #gameboard {
       width: 100%;
       height: 100%;
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-    }
-  }
+      flex-direction: column;
 
-  @media (min-width: 425px) {
-    #game-board {
-      gap: 2px;
-    }
-  }
+      #tiles-area {
+        flex-grow: 1;
+        display: flex;
 
-  @media (min-width: 768px) {
-    #game-board {
-      gap: 4px;
+        #tiles-wrapper {
+          margin: auto;
+          width: 100%;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          align-items: center;
+          gap: 1px;
+          padding: var(--app-external-padding);
+        }
+      }
     }
-  }
 
-  @media (min-width: 1024px) {
-    #game-board {
-      gap: 8px;
+    #game-settings {
+      padding: var(--app-external-padding);
+    }
+
+    @media (min-width: 425px) {
+      #tiles-area {
+        gap: 2px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      #tiles-area {
+        gap: 4px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      #tiles-area {
+        gap: 8px;
+      }
     }
   }
 </style>
