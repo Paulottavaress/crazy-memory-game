@@ -7,13 +7,13 @@
         <li><p>Score: {{ currentPlayer.score }}</p></li>
       </ul>
       <div class="icon-container">
-        <i @click="toggleTab" class="fa-solid fa-arrow-down"></i>
+        <i @click="toggleTab(false)" class="fa-solid fa-arrow-down"></i>
       </div>
     </div>
     <div v-else id="match-details-closed">
       <p>{{ currentPlayer.name }} / {{ currentPlayer.pairsCount }} / {{ currentPlayer.score }}</p>
       <div class="icon-container">
-        <i @click="toggleTab" class="fa-solid fa-arrow-up"></i>
+        <i @click="toggleTab(true)" class="fa-solid fa-arrow-up"></i>
       </div>
     </div>
   </section>
@@ -23,6 +23,7 @@
   import { defineComponent } from 'vue';
   import Player from '@/types/Player';
   import type { PropType } from 'vue';
+  import { mapActions } from 'vuex';
 
   export default defineComponent({
     data() {
@@ -31,8 +32,13 @@
       }
     },
     methods: {
-      toggleTab() {
-        this.isOpen = !this.isOpen;
+      ...mapActions([
+        'checkIfTilesAreOverflowing',
+        'resetTileSizeCorrection'
+      ]),
+      toggleTab(tabStatus: boolean) {
+        this.isOpen = tabStatus;
+        if (!tabStatus) this.resetTileSizeCorrection();
       }
     },
     props: {
@@ -40,6 +46,10 @@
         type: Object as PropType<Player>,
         required: true
       }
+    },
+    name: 'MatchDetails',
+    updated() {
+      this.checkIfTilesAreOverflowing();
     }
   });
 </script>

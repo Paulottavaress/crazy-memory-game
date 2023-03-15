@@ -43,6 +43,7 @@
 
 <script lang="ts">
   import { defineComponent } from 'vue';
+  import { mapGetters, mapActions } from 'vuex';
   import BaseTile from '../UI/BaseTile.vue';
   import GameConfig from '@/types/GameConfig';
   import MatchDetails from './MatchDetails.vue';
@@ -56,7 +57,14 @@
       MatchDetails,
       MatchFinalScreen
     },
+    created() {
+      window.addEventListener('resize', this.resetTileSizeCorrection);
+    },
     computed: {
+      ...mapGetters([
+        'tileSizeCorrection',
+        'idealTileSizeCorrection'
+      ]),
       calculateTileSize(): {width: number, height: number} {
         const gb = this.$refs.main as HTMLElement;
         const gbPaddingRight = parseInt(window.getComputedStyle(gb).paddingRight);
@@ -77,8 +85,8 @@
         }
 
         return {
-          width: tileHeight - this.deviceSettings.tileSizeCorrection, 
-          height: tileHeight - this.deviceSettings.tileSizeCorrection
+          width: tileHeight - this.tileSizeCorrection, 
+          height: tileHeight - this.tileSizeCorrection
         };
       },
       checkIfIsMatch(): boolean {
@@ -96,10 +104,6 @@
     },
     data() {
       return {
-        deviceSettings: {
-          tileSizeCorrection: 2,
-          tileGap: 1
-        },
         gameConfig: {
           pairCount: 24, //24 //36 //48(probably won't work in small devices)
           matchBasePoints: 50,
@@ -133,7 +137,14 @@
         tiles: [] as Tile[]
       }
     },
+    unmounted() {
+      window.removeEventListener('resize', this.resetTileSizeCorrection);
+    },
     methods: {
+      ...mapActions([
+        'checkIfTilesAreOverflowing',
+        'resetTileSizeCorrection'
+      ]),
       addPair(val: number): void {
         this.tiles.push({
           id: this.tiles.length + 1,
@@ -141,17 +152,6 @@
           isSelected: false,
           isPaired: false
         });
-      },
-      checkIfTilesAreOverflowing() {
-        const gb = this.$refs.main as HTMLElement;
-
-        if (gb) {
-          const isOverflowing = 
-          gb.clientWidth < gb.scrollWidth 
-          || gb.clientHeight < gb.scrollHeight;
-
-          if (isOverflowing) this.deviceSettings.tileSizeCorrection++;
-        }
       },
       handleMatch(): void {
         this.selectedTiles.forEach((selectedTile: Tile) => {
@@ -226,9 +226,9 @@
         this.tiles.forEach(tile => tile.isSelected = false);
       }
     },
-    name: 'GameBoard',
+    name: 'TheGameboard',
     updated() {
-      this.checkIfTilesAreOverflowing();
+      this.$store.dispatch('checkIfTilesAreOverflowing');
     }
   });
 </script>
@@ -265,22 +265,40 @@
     #game-settings {
       padding: var(--app-external-padding);
     }
+  }
 
-    @media (min-width: 425px) {
-      #tiles-area {
-        gap: 2px;
+  @media (min-width: 425px) {
+    main {
+      #gameboard {
+        #tiles-area {
+          #tiles-wrapper {
+            gap: 2px;
+          }
+        }
       }
     }
+  }
 
-    @media (min-width: 768px) {
-      #tiles-area {
-        gap: 4px;
+  @media (min-width: 768px) {
+    main {
+      #gameboard {
+        #tiles-area {
+          #tiles-wrapper {
+            gap: 4px;
+          }
+        }
       }
     }
+  }
 
-    @media (min-width: 1024px) {
-      #tiles-area {
-        gap: 8px;
+  @media (min-width: 1024px) {
+    main {
+      #gameboard {
+        #tiles-area {
+          #tiles-wrapper {
+            gap: 8px;
+          }
+        }
       }
     }
   }

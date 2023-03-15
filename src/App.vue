@@ -1,16 +1,16 @@
 <template>
   <div id="main-container">
-    <GameBoard />
+    <TheGameboard />
   </div>
 </template>
 
 <script lang="ts">
   import { defineComponent } from 'vue';
-  import GameBoard from './components/match/GameBoard.vue';
+  import TheGameboard from './components/match/TheGameboard.vue';
 
   export default defineComponent ({
     components: {
-      GameBoard
+      TheGameboard
     }
   });
 </script>
@@ -23,6 +23,7 @@
     --game-table-color: rgb(12, 90, 26);
     --overlay-color: rgba(0, 0, 0, 0.75);
     --app-external-padding: 8px;
+    --container-max-width: 1440px;
   }
 
   * {

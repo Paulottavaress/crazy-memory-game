@@ -1,14 +1,8 @@
-import { createStore } from 'vuex'
+import { createStore } from 'vuex';
+import matchModule from './modules/match';
 
 export default createStore({
-  state: {
-  },
-  getters: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
   modules: {
+    matchModule
   }
 })
